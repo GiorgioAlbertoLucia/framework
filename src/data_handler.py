@@ -24,32 +24,27 @@ class TableHandler(DataHandler):
     '''
         Class to open data from AO2D.root files generated with a O2Physics table producer
     '''
-    def __init__(self, inFilePath: str, treeName: str, dirPrefix: str):
+    def __init__(self, inFilePath: str, treeName: str, dirPrefix: str, **kwargs):
 
         self.inFilePath = inFilePath
         if type(self.inFilePath) is str:
-            self.inData = self._open(inFilePath, treeName, dirPrefix)
+            self.inData = self._open(inFilePath, treeName, dirPrefix, **kwargs)
         elif type(self.inFilePath) is list:
             dfs = []
             for f in inFilePath:
-                dfs.append(self._open(f, treeName, dirPrefix))
+                dfs.append(self._open(f, treeName, dirPrefix, **kwargs))
             self.inData = pd.concat(dfs)
 
-    def _open(self, inFilePath: str, treeName: str, dirPrefix: str):
+    def _open(self, inFilePath: str, treeName: str, dirPrefix: str, **kwargs):
 
         if inFilePath.endswith('.root'):
             
             print(tc.GREEN+'[INFO]: '+tc.RESET+'Opening '+tc.UNDERLINE+tc.CYAN+f'{inFilePath}'+tc.RESET)
             print(tc.GREEN+'[INFO]: '+tc.RESET+'Using tree '+tc.GREEN+f'{treeName}'+tc.RESET+' and directory prefix '+tc.GREEN+f'{dirPrefix}'+tc.RESET)
-            th = TreeHandler(inFilePath, treeName, folder_name=dirPrefix)
+            th = TreeHandler(inFilePath, treeName, folder_name=dirPrefix, **kwargs)
             return th.get_data_frame()
 
         else:   raise ValueError(tc.RED+'[ERROR]:'+tc.RESET+' File extension not supported')
-
-
-
-
-
 
 class TaskHandler(DataHandler):
     '''

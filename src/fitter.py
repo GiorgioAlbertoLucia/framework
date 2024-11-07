@@ -57,7 +57,7 @@ class Fitter:
 
     def auto_initialise(self):
         '''
-            Automatically initialise the parameters.
+            Automatically initialise the parameters for a gaussian fit.
             Expects the function with lower mean to be the first in the list.
         '''
 
@@ -123,6 +123,3 @@ class Fitter:
         
         fit_status = self.data.Fit(self.fit, kwargs.get('fit_option', 'RMS+'))
         return fit_status, self.fit
-
-
-

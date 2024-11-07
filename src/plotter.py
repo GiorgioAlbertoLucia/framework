@@ -124,6 +124,44 @@ class Plotter:
                 x1, y1, x2, y2: float
                     coordinates of the color band
         '''
+        if type(lineSpecs) is dict:
+            line = TLine(lineSpecs['x1'], lineSpecs['y1'], lineSpecs['x2'], lineSpecs['y2'])
+            line.SetLineColor(kwargs.get('line_color', 1))
+            line.SetLineWidth(kwargs.get('line_width', 1))
+            line.SetLineStyle(kwargs.get('line_style', 1))
+            self.lineDict[lineSpecs['name']] = line
+            if kwargs.get('leg_add_line', True) and self.legend is not None and 'name' in lineSpecs.keys(): 
+                self.legend.AddEntry(line, lineSpecs['name'], kwargs.get('leg_option', 'l'))
+        
+        band = TBox(boxSpecs['x1'], boxSpecs['y1'], boxSpecs['x2'], boxSpecs['y2'])
+        band.SetFillColorAlpha(kwargs.get('fill_color', 0), kwargs.get('fill_alpha', 1))
+        band.SetFillStyle(kwargs.get('fill_style', 0))
+        if 'name' in boxSpecs.keys():
+            self.boxDict[boxSpecs['name']] = band
+            if kwargs.get('leg_add_box', True) and self.legend: 
+                self.legend.AddEntry(band, boxSpecs['name'], kwargs.get('leg_option', 'l'))
+        elif 'name' in lineSpecs.keys():
+            self.boxDict[lineSpecs['name']] = band
+            if kwargs.get('leg_add_box', True) and self.legend: 
+                self.legend.AddEntry(band, lineSpecs['name'], kwargs.get('leg_option', 'l'))
+        
+        self.canvas.cd()
+        if type(lineSpecs) is dict:
+            self.lineDict[lineSpecs['name']].Draw(kwargs.get('draw_option', 'SAME'))
+        if 'name' in boxSpecs.keys():       self.boxDict[boxSpecs['name']].Draw(kwargs.get('draw_option', 'SAME'))
+        elif 'name' in lineSpecs.keys():    self.boxDict[lineSpecs['name']].Draw(kwargs.get('draw_option', 'SAME'))
+
+    def addLine(self, lineSpecs: dict, **kwargs):
+        '''
+            Draw a line between point 1 and 2 and a color band around it
+            
+            lineSpecs: dict 
+                    x1, y1, x2, y2: float
+                    name: str  
+            boxSpecs: dict
+                x1, y1, x2, y2: float
+                    coordinates of the color band
+        '''
         
         line = TLine(lineSpecs['x1'], lineSpecs['y1'], lineSpecs['x2'], lineSpecs['y2'])
         line.SetLineColor(kwargs.get('line_color', 1))
@@ -132,14 +170,8 @@ class Plotter:
         self.lineDict[lineSpecs['name']] = line
         if kwargs.get('leg_add', True) and self.legend is not None: self.legend.AddEntry(line, lineSpecs['name'], kwargs.get('leg_option', 'l'))
         
-        band = TBox(boxSpecs['x1'], boxSpecs['y1'], boxSpecs['x2'], boxSpecs['y2'])
-        band.SetFillColorAlpha(kwargs.get('fill_color', 0), kwargs.get('fill_alpha', 1))
-        band.SetFillStyle(kwargs.get('fill_style', 0))
-        self.boxDict[lineSpecs['name']] = band
-        
         self.canvas.cd()
         self.lineDict[lineSpecs['name']].Draw(kwargs.get('draw_option', 'SAME'))
-        self.boxDict[lineSpecs['name']].Draw(kwargs.get('draw_option', 'SAME'))
 
     def createLegend(self, position, **kwargs):
         ''' 
@@ -187,8 +219,3 @@ class Plotter:
         
     def close(self):
         self.outFile.Close()
-        
-        
-
-
-
